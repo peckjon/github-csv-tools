@@ -88,6 +88,61 @@ See [CHANGELOG.md](https://github.com/gavinr/github-csv-tools/blob/master/CHANGE
 
 This software can be used without download/install by going to [repoio.com](https://repoio.com).
 
+## Running as a GitHub Action
+
+If you wish to periodically save your issues CSV as a file in your repo, create a YAML file inside `.github/workflows/`
+
+```yaml
+name: Run GitHub CSV Tools
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every Sunday
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  run-csv-tools:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install github-csv-tools globally
+      run: npm install -g github-csv-tools
+
+    - name: Create archive directory
+      run: mkdir -p archive
+
+    - name: Export issues to CSV
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd archive
+        githubCsvTools -t "${GITHUB_TOKEN}" -o YOUR_ORGANIZATION -r YOUR_REPO -e -c
+
+    - name: Configure Git
+      run: |
+        git config user.email "YOUR_HANDLE@github.com"
+        git config user.name "YOUR NAME"
+
+    - name: Commit and push CSV file
+      run: |
+        cd archive
+        git add *-issues.csv
+        git commit -m "Update issues CSV" || true
+        git pull --no-rebase
+        git push
+```
+
+This will run weekly, creating a new CSV file under the "archive" folder (rename if desired), and can also be executed manually in the Actions tab of your repo.
+
+Be sure to replace the following values:
+- YOUR_ORGANIZATION: The User or Organization slug that the repo lives under
+- YOUR_REPO: The repository name (slug)
+- YOUR_HANDLE: Your GitHub handle
+- YOUR NAME: Your name as you with it to appear in the commit history
+
 ## Thanks
 
 - [octokit/rest.js](https://octokit.github.io/rest.js/)
