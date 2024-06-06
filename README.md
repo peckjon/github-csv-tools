@@ -141,7 +141,7 @@ Be sure to replace the following values:
 - YOUR_ORGANIZATION: The User or Organization slug that the repo lives under
 - YOUR_REPO: The repository name (slug)
 - YOUR_HANDLE: Your GitHub handle
-- YOUR NAME: Your name as you with it to appear in the commit history
+- YOUR NAME: Your name as you wish it to appear in the commit history
 
 ## Thanks
 
